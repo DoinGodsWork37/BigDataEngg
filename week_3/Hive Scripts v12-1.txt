@@ -1,0 +1,289 @@
+http://research.chicagobooth.edu/kilts/marketing-databases/dominicks/category-files
+
+
+--create database / schema for your work
+create database if not exists kadochnikov;
+show databases;
+
+
+
+
+--switch to my database;
+use kadochnikov;
+show tables;
+
+
+
+
+
+--Drop table, in-case it exists
+drop table ccount_nk01;
+
+--Create table structure
+create table ccount_nk01 (STORE float, DATE string, GROCERY float, DAIRY float, FROZEN float, BOTTLE float, MVPCLUB float, GROCCOUP float, MEAT float, MEATFROZ float, MEATCOUP float, FISH float, FISHCOUP float, PROMO float, PROMCOUP float, PRODUCE float, BULK float, SALADBAR float, PRODCOUP float, BULKCOUP float, SALCOUP float, FLORAL float, FLORCOUP float, DELI float, DELISELF float, DELIEXPR float, CONVFOOD float, CHEESE float, DELICOUP float, BAKERY float, PHARMACY float, PHARCOUP float, GM float, JEWELRY float, COSMETIC float, HABA float, GMCOUP float, CAMERA float, PHOTOFIN float, VIDEO float, VIDEOREN float, VIDCOUP float, BEER float, WINE float, SPIRITS float, MISCSCP float, MANCOUP float, CUSTCOUN float, FTGCHIN float, FTGCCOUP float, FTGITAL float, FTGICOUP float, DAIRCOUP float, FROZCOUP float, HABACOUP float, PHOTCOUP float, COSMCOUP float, SSDELICP float, BAKCOUP float, LIQCOUP float, WEEK float) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' STORED AS TEXTFILE;
+
+
+
+
+--Check table layout
+describe ccount_nk01;
+
+--Get record count
+select count (*) from ccount_nk01;
+
+
+
+
+
+--In case file gets deleted from HDFS
+--hadoop fs -put /home/kadochnikov/data/ccount.txt /user/kadochnikov/Dominicks/ccount.txt
+
+LOAD DATA INPATH '/user/kadochnikov/Dominicks/ccount.txt' INTO TABLE ccount_nk01;
+-- from HDFS
+-- source file is moved
+
+--Check record counts
+select count (*) as records from ccount_nk01;
+
+LOAD DATA LOCAL INPATH '/home/kadochnikov/data/ccount.txt' INTO TABLE ccount_nk01;
+-- from LINUX
+-- source file stays
+
+--Check record counts - what happened?
+select count (*) as records from ccount_nk01;
+
+--Overwrite to avoid duplications
+LOAD DATA INPATH '/user/kadochnikov/Dominicks/ccount.txt' OVERWRITE INTO TABLE ccount_nk01;
+
+
+
+drop table ccount_nk02;
+
+--External table.  Drop only affects metadata
+create external table ccount_nk02 (STORE float, DATE string, GROCERY float, DAIRY float, FROZEN float, BOTTLE float, MVPCLUB float, GROCCOUP float, MEAT float, MEATFROZ float, MEATCOUP float, FISH float, FISHCOUP float, PROMO float, PROMCOUP float, PRODUCE float, BULK float, SALADBAR float, PRODCOUP float, BULKCOUP float, SALCOUP float, FLORAL float, FLORCOUP float, DELI float, DELISELF float, DELIEXPR float, CONVFOOD float, CHEESE float, DELICOUP float, BAKERY float, PHARMACY float, PHARCOUP float, GM float, JEWELRY float, COSMETIC float, HABA float, GMCOUP float, CAMERA float, PHOTOFIN float, VIDEO float, VIDEOREN float, VIDCOUP float, BEER float, WINE float, SPIRITS float, MISCSCP float, MANCOUP float, CUSTCOUN float, FTGCHIN float, FTGCCOUP float, FTGITAL float, FTGICOUP float, DAIRCOUP float, FROZCOUP float, HABACOUP float, PHOTCOUP float, COSMCOUP float, SSDELICP float, BAKCOUP float, LIQCOUP float, WEEK float) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' STORED AS TEXTFILE
+LOCATION '/user/kadochnikov/Data/';
+
+select count (*) from ccount_nk02;
+
+--LOAD DATA INPATH '/user/kadochnikov/Dominicks/ccount.txt' INTO TABLE ccount_nk02;
+
+
+
+
+
+
+
+--Specifying alternative file formats.
+--?????? Can I specify RCFile from the beginning??????
+
+--Drop table, in-case it exissts
+drop table ccount_nk06;
+
+--Create table structure
+create table ccount_nk06 (STORE float, DATE string, GROCERY float, DAIRY float, FROZEN float, BOTTLE float, MVPCLUB float, GROCCOUP float, MEAT float, MEATFROZ float, MEATCOUP float, FISH float, FISHCOUP float, PROMO float, PROMCOUP float, PRODUCE float, BULK float, SALADBAR float, PRODCOUP float, BULKCOUP float, SALCOUP float, FLORAL float, FLORCOUP float, DELI float, DELISELF float, DELIEXPR float, CONVFOOD float, CHEESE float, DELICOUP float, BAKERY float, PHARMACY float, PHARCOUP float, GM float, JEWELRY float, COSMETIC float, HABA float, GMCOUP float, CAMERA float, PHOTOFIN float, VIDEO float, VIDEOREN float, VIDCOUP float, BEER float, WINE float, SPIRITS float, MISCSCP float, MANCOUP float, CUSTCOUN float, FTGCHIN float, FTGCCOUP float, FTGITAL float, FTGICOUP float, DAIRCOUP float, FROZCOUP float, HABACOUP float, PHOTCOUP float, COSMCOUP float, SSDELICP float, BAKCOUP float, LIQCOUP float, WEEK float) STORED AS RCFile;
+
+LOAD DATA INPATH '/user/kadochnikov/Dominicks/ccount.txt' INTO TABLE ccount_nk06;
+--??? Why did it fail ???
+
+LOAD DATA LOCAL INPATH '/home/kadochnikov/data/ccount.txt' INTO TABLE ccount_nk06;
+--??? Why did this one fail as well ???
+
+
+
+
+
+
+--Specifying alternative file formats.
+drop table ccount_nk07;
+CREATE TABLE ccount_nk07
+   STORED AS RCFile
+   AS
+select * from ccount_nk01;
+
+describe formatted ccount_nk07;
+
+select count (*) from ccount_nk07;
+
+
+
+
+
+--Creating indexes
+create index ccount_nk1_idx_01 on table ccount_nk01 (STORE) as 'COMPACT' with deferred rebuild;
+show index on ccount_nk01;
+show formatted index on ccount_nk01;
+drop index ccount_nk1_idx_01 on ccount_nk01;
+
+
+
+drop table ccount_nk04;
+create table ccount_nk04 as select
+   STORE,
+   sum(CHEESE) as CHEESE
+from ccount_nk01
+   group by STORE;
+	
+	
+	
+select * from ccount_nk04 limit 20;
+
+
+
+select
+   count (*) as RECORDS,
+   sum(CHEESE) as SUM_CHEESE,
+   avg(CHEESE) as AVG_CHEESE,
+   min(CHEESE) as MIN_CHEESE,
+   max(CHEESE) as MAX_CHEESE
+from ccount_nk01;
+	
+	
+
+	
+drop table ccount_nk04;
+create table ccount_nk04 as select
+   STORE,
+   count (*) as RECORDS,
+   sum(CHEESE) as SUM_CHEESE,
+   avg(CHEESE) as AVG_CHEESE,
+   min(CHEESE) as MIN_CHEESE,
+   max(CHEESE) as MAX_CHEESE
+from ccount_nk01
+   group by STORE;	
+	
+	
+	
+	
+
+drop table LungCap;
+
+create table LungCap (LungCap float, Age int, Height float,  Smoke string, Gender string, Caesarean string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE;	
+
+LOAD DATA LOCAL INPATH '/home/kadochnikov/data/LungCapData.csv' INTO TABLE LungCap;
+
+select count (*) from LungCap;
+
+select * from lungcap limit 10;
+--??? Check first line ???
+
+select count(*) as records, gender from LungCap group by gender;
+
+
+drop table LungCap;
+
+create table LungCap (LungCap float, Age int, Height float,  Smoke string, Gender string, Caesarean string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE
+tblproperties ("skip.header.line.count"="1");	
+
+LOAD DATA LOCAL INPATH '/home/kadochnikov/data/LungCapData.csv' INTO TABLE LungCap;
+
+select count (*) from lungcap;
+
+select * from lungcap limit 10;
+--??? Check first line ???
+
+
+
+drop table LungCap;
+
+create table LungCap (LungCap float, Age int, Height float,  Smoke string, Gender string, Caesarean string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE
+tblproperties ("skip.header.line.count"="1", "skip.footer.line.count"="1");
+
+LOAD DATA LOCAL INPATH '/home/kadochnikov/data/LungCapData.csv' INTO TABLE LungCap;
+
+select count (*) from lungcap;
+
+select * from lungcap limit 10;
+--??? Check first line ???
+
+
+
+
+
+
+--Now we are trying "proper" CSV file
+drop table LungCap2;
+
+create table LungCap2 (LungCap float, Age int, Height float,  Smoke string, Gender string, Caesarean string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE
+tblproperties ("skip.header.line.count"="1");	
+
+LOAD DATA LOCAL INPATH '/home/kadochnikov/data/LungCapData.txt' INTO TABLE LungCap2;
+
+select * from LungCap2 limit 10;
+--??? What can we do with the qoutes ???
+
+
+
+
+--Proper CSV file, but this time with SerDe
+drop table LungCap2;
+
+CREATE TABLE LungCap2 (LungCap float, Age int, Height float,  Smoke string, Gender string, Caesarean string)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES (
+   "separatorChar" = ",")  
+STORED AS TEXTFILE;
+
+LOAD DATA LOCAL INPATH '/home/kadochnikov/data/LungCapData.txt' INTO TABLE LungCap2;
+
+select * from LungCap2 limit 10;
+--??? Did we fix quotes ???
+
+
+
+
+
+--Now we will store our data as Parquet to permanently avoid problems with quotes, delimiters, etc.
+--However storing as Parquet (binary file) will eliminate ability to use head / tail options to see data as text file
+--drop table LungCapParquet;
+CREATE EXTERNAL TABLE IF NOT EXISTS LungCapParquet (LungCap float, Age int, Height float,  Smoke string, Gender string, Caesarean string)
+STORED AS PARQUET
+LOCATION '/user/kadochnikov/lung/'
+
+--Will invoke Map-Reduce
+INSERT INTO LungCapParquet SELECT * FROM LungCap2;
+
+
+SELECT * from LungCapParquet limit 10;
+DESCRIBE LungCapParquet;
+
+
+--Can cast variable types as needed.
+INSERT INTO LungCapParquet 
+SELECT 
+LungCap, 
+CAST (age as float),
+Height,
+Smoke,
+Gender,
+Caesarean
+FROM LungCap2;
+
+
+
+-- what happens with our records count?
+SELECT count (*) from LungCap2;
+SELECT count (*) from LungCapParquet;
+
+
+
+tail '/home/kadochnikov/data/LungCapData.txt'
+hadoop fs -ls '/user/kadochnikov/lung/'
+--Running tail on a binary file will mess-up your shell!
+hadoop fs -tail '/user/kadochnikov/lung/000000_0'
+
+
+
+
+--OpenCSVSerde
+--https://cwiki.apache.org/confluence/display/Hive/CSV+Serde
+WITH SERDEPROPERTIES (
+   "separatorChar" = "\t",
+   "quoteChar"     = "'",
+   "escapeChar"    = "\\"
+) 
+DEFAULT_ESCAPE_CHARACTER \
+DEFAULT_QUOTE_CHARACTER  "
+DEFAULT_SEPARATOR        ,
+
+
+

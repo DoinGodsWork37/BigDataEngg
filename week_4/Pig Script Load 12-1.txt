@@ -1,0 +1,296 @@
+-- Exercise 01
+-- Reading from text file without variable name assignment
+medicare = LOAD '/user/kadochnikov/Medicare_DB/Medicare-Physician-and-Other-Supplier-PUF-CY2012.txt';
+medicare_s1 = limit medicare 10;
+medicare_s2 = foreach medicare_s1 generate $2, $1;
+dump medicare_s2;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- Exercise 02
+-- Reading from text file.  Result is overall aggregation
+-- Load flat file 'medicare'
+medicare = LOAD '/user/kadochnikov/Medicare_DB/Medicare-Physician-and-Other-Supplier-PUF-CY2012.txt' AS 
+(npi: CHARARRAY,
+nppes_provider_last_org_name: CHARARRAY,
+nppes_provider_first_name: CHARARRAY,
+nppes_provider_mi: CHARARRAY,
+nppes_credentials: CHARARRAY,
+nppes_provider_gender: CHARARRAY,
+nppes_entity_code: CHARARRAY,
+nppes_provider_street1: CHARARRAY,
+nppes_provider_street2: CHARARRAY,
+nppes_provider_city: CHARARRAY,
+nppes_provider_zip: CHARARRAY,
+nppes_provider_state: CHARARRAY,
+nppes_provider_country: CHARARRAY,
+provider_type: CHARARRAY,
+medicare_participation_indicator: CHARARRAY,
+place_of_service: CHARARRAY,
+hcpcs_code: CHARARRAY,
+hcpcs_description: CHARARRAY,
+line_srvc_cnt: FLOAT,
+bene_unique_cnt: FLOAT,
+bene_day_srvc_cnt: FLOAT,
+average_medicare_allowed_amt: FLOAT,
+stdev_medicare_allowed_amt: FLOAT,
+average_submitted_chrg_amt: FLOAT,
+stdev_submitted_chrg_amt: FLOAT,
+average_medicare_payment_amt: FLOAT,
+stdev_medicare_payment_amt: FLOAT);
+
+-- Compute the average charges and payments of the table
+charges = GROUP medicare ALL;
+out = FOREACH charges GENERATE 
+	AVG(medicare.average_submitted_chrg_amt), 
+	AVG(medicare.average_medicare_payment_amt);
+DUMP out;
+
+
+++++++++++++++++++++++++++++++++++++++++++
+HiveQL version
+select
+	AVG(medicare.average_submitted_chrg_amt), 
+	AVG(medicare.average_medicare_payment_amt)
+from my_table
+++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+-- Exercise 03
+-- For Grunt type "pig -useHCatalog"
+-- In Properties -> Hadoop properties  -> add an entries:
+--	Name="oozie.action.sharelib.for.pig" and Value: "pig,hcatalog,hive"
+medicare = LOAD 'kadochnikov.medicare' USING org.apache.hive.hcatalog.pig.HCatLoader();
+medicare_s1 = limit medicare 10;
+medicare_s2 = foreach medicare_s1 generate average_submitted_chrg_amt, average_medicare_payment_amt;
+dump medicare_s2;
+
+
+
+++++++++++++++++++++++++++++++++++++++++++
+HiveQL version
+select
+average_submitted_chrg_amt, average_medicare_payment_amt
+from kadochnikov.medicare
+limit 10
+++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+
+
+
+-- Exercise 04
+-- Reading from Hive.  Result are aggregate over entire table?
+-- Load table 'medicare'
+medicare = LOAD 'kadochnikov.medicare' USING org.apache.hive.hcatalog.pig.HCatLoader();
+
+-- Compute the average charges and payments of the table
+charges = GROUP medicare ALL;
+out = FOREACH charges GENERATE 
+	AVG(medicare.average_submitted_chrg_amt), 
+	AVG(medicare.average_medicare_payment_amt);
+DUMP out;
+
+
+
+
+
+
+
+
+
+
+
+-- Exercise 05
+-- Reading from Hive.  Result is by provider_type... 
+-- ***but where is provider_type?
+-- Load table 'medicare'
+medicare = LOAD 'kadochnikov.medicare' USING org.apache.hive.hcatalog.pig.HCatLoader();
+
+-- Compute the average charges and payments of the table
+charges = GROUP medicare BY provider_type;
+out = FOREACH charges GENERATE 
+	AVG(medicare.average_submitted_chrg_amt), 
+	AVG(medicare.average_medicare_payment_amt);
+DUMP out;
+
+
+
+
+
+
+
+
+
+
+-- Exercise 06
+-- Reading from Hive.  Result is by provider_type.
+-- Adding a provider type to #03
+medicare = LOAD 'kadochnikov.medicare' USING org.apache.hive.hcatalog.pig.HCatLoader();
+charges = GROUP medicare BY provider_type;
+out = FOREACH charges GENERATE 
+	group as provider_type,
+	AVG(medicare.average_submitted_chrg_amt) as average_submitted_chrg_amt, 
+	AVG(medicare.average_medicare_payment_amt) as average_medicare_payment_amt;
+DUMP out;
+
+
+
+
+
+
+
+
+
+-- Exercise 07
+-- Same as #04, but now writing to a file
+
+medicare = LOAD 'kadochnikov.medicare' USING org.apache.hive.hcatalog.pig.HCatLoader();
+
+charges = GROUP medicare BY provider_type;
+
+out = FOREACH charges GENERATE 
+	group as provider_type,
+	AVG(medicare.average_submitted_chrg_amt) as average_submitted_chrg_amt, 
+	AVG(medicare.average_medicare_payment_amt) as average_medicare_payment_amt;
+
+-- Removing existing directory
+rmf /user/kadochnikov/Medicare_DB_Sum
+STORE out INTO '/user/kadochnikov/Medicare_DB_Sum';
+-- ****Note how many "parts" - number of reducers!
+
+
+
+
+
+
+
+
+
+
+-- Exercise 08
+--Forcing a single output.  Is this a good practice?
+medicare = LOAD 'kadochnikov.medicare' USING org.apache.hive.hcatalog.pig.HCatLoader();
+
+charges = GROUP medicare BY provider_type;
+
+out = FOREACH charges GENERATE 
+	group as provider_type,
+	AVG(medicare.average_submitted_chrg_amt) as average_submitted_chrg_amt, 
+	AVG(medicare.average_medicare_payment_amt) as average_medicare_payment_amt;
+
+rmf /user/kadochnikov/Medicare_DB_Sum
+
+--forcing a single file output.  
+reduced = FOREACH (GROUP out BY RANDOM()) GENERATE FLATTEN(out);
+STORE reduced INTO '/user/kadochnikov/Medicare_DB_Sum';
+-- In reality, most applications on Hadoop will take a directory as an input and read all the files contained in it.
+
+
+
+
+
+
+
+-- Exercise 09
+-- Now saving output into Hive table
+SET hcat.bin /usr/bin/hcat;
+medicare = LOAD 'kadochnikov.medicare' USING org.apache.hive.hcatalog.pig.HCatLoader();
+
+charges = GROUP medicare BY provider_type;
+
+out = FOREACH charges GENERATE 
+	group as provider_type,
+	AVG(medicare.average_submitted_chrg_amt) as average_submitted_chrg_amt, 
+	AVG(medicare.average_medicare_payment_amt) as average_medicare_payment_amt;
+	
+sql drop table kadochnikov.medicare_s1;
+sql create table kadochnikov.medicare_s1 (provider_type string, average_submitted_chrg_amt double, average_medicare_payment_amt double); 
+
+STORE out INTO 'kadochnikov.medicare_s1' USING org.apache.hive.hcatalog.pig.HCatStorer();
+
+
+
+
+
+-- Exercise 10
+SET hcat.bin /usr/bin/hcat;
+
+A = LOAD 'kadochnikov.medicare' USING org.apache.hive.hcatalog.pig.HCatLoader();
+
+B = FILTER A BY place_of_service in ('F', 'O');
+
+C = GROUP B BY (place_of_service, provider_type);
+
+D = FOREACH C GENERATE 
+	FLATTEN(group) as (place_of_service, provider_type), 
+	COUNT(B) as records,
+	AVG(B.average_submitted_chrg_amt) as average_submitted_chrg, 
+	SUM(B.average_submitted_chrg_amt) as tot_submitted_chrg,
+	AVG(B.average_medicare_payment_amt) as average_medicare_payment,
+	SUM(B.average_medicare_payment_amt) as tot_medicare_payment;
+	
+
+	
+sql drop table kadochnikov.medicare_s2;sql drop table kadochnikov.medicare_s2;
+sql create table kadochnikov.medicare_s2 (place_of_service string, provider_type string, 
+	records bigint, 
+	average_submitted_chrg double, 
+	tot_submitted_chrg double, 
+	average_medicare_payment double, 
+	tot_medicare_payment double);
+
+STORE D INTO 'kadochnikov.medicare_s2' USING org.apache.hive.hcatalog.pig.HCatStorer();
+
+
+
+
+
+
+
+-- Exercise 11
+SET hcat.bin /usr/bin/hcat;
+REGISTER /opt/cloudera/parcels/CDH/lib/pig/piggybank.jar
+
+sql drop table kadochnikov.lungcap;
+sql create table kadochnikov.lungcap (lungcap float, age int, height float, smoke string, gender string, caesarean string);
+
+
+A = LOAD '/user/kadochnikov/Data/LungCapData.txt' USING org.apache.pig.piggybank.storage.CSVExcelStorage(',', 'NO_MULTILINE', 'UNIX', 'SKIP_INPUT_HEADER')
+as (lungcap: float, age: int, height: float, smoke: chararray, gender: chararray, caesarean: chararray);
+
+STORE A INTO 'kadochnikov.lungcap' USING org.apache.hive.hcatalog.pig.HCatStorer();
+
+
+F = LOAD 'kadochnikov.lungcap' USING org.apache.hive.hcatalog.pig.HCatLoader();
+G = limit F 10;
+dump G;
+
+
+
+-- Describe helps you understand how the data is stored internally in Pig
+describe D;
+
+-- Helps you understand how to convert data types from Pig to Hive
+https://cwiki.apache.org/confluence/display/Hive/HCatalog+LoadStore#HCatalogLoadStore-TypesinHive0.13.0andLater.1
+
