@@ -1,0 +1,27 @@
+ssh command
+
+cd data
+cp /project/msca/kadochnikov/data/Municipal_Court_Caseload_Information.zip  ./
+
+unzip Municipal_Court_Caseload_Information.zip
+
+hive
+
+CREATE DATABASE IF NOT EXISTS sriharis;
+
+USE sriharis;
+
+SHOW TABLES;
+
+CREATE TABLE MunicipalCourtCaseLoadInformation (offense_case_type String, offense_date String, offense_time String, offense_charge_desc String, offense_street_name String, offense_cross_street_check String, offense_cross_street String, school_zone String, construction_zone String, case_closed String) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE tblproperties ("skip.header.line.count"="1");
+
+SHOW TABLES;
+
+LOAD DATA LOCAL INPATH '/home/sriharis/data/Municipal_Court_Caseload_Information.csv' INTO TABLE MunicipalCourtCaseLoadInformation;
+
+SELECT COUNT(*) FROM MunicipalCourtCaseLoadInformation;
+
+SELECT offense_case_type, COUNT(offense_case_type) AS frequency FROM MunicipalCourtCaseLoadInformation GROUP BY offense_case_type;
+
+SELECT offense_charge_desc, COUNT(offense_charge_desc) AS offense_freq_count FROM municipalcourtcaseloadinformation GROUP BY offense_charge_desc SORT BY offense_freq_count DESC;
+
