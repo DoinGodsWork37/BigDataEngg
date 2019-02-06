@@ -1,3 +1,6 @@
+pig -useHCatalog
+
+
 -- Exercise 01
 -- Reading from text file without variable name assignment
 medicare = LOAD '/user/kadochnikov/Medicare_DB/Medicare-Physician-and-Other-Supplier-PUF-CY2012.txt';
