@@ -1,0 +1,80 @@
+# Open a secure shell into the Hadoop server
+ssh command
+ssh sriharis@hadoop.rcc.uchicago.edu
+
+
+
+# ------------------------------------------------------------------------------------------- #
+# Q1. Copy the file into your own directory on Linux server
+# Save the ZIP file into a folder
+mkdir data && cd data
+cp /project/msca/kadochnikov/data/Municipal_Court_Caseload_Information.zip  ./
+
+
+
+# ------------------------------------------------------------------------------------------- #
+# Q2. Unzip the file
+# Extract the zip file
+unzip Municipal_Court_Caseload_Information.zip
+
+
+
+# ------------------------------------------------------------------------------------------- #
+# Q3. Load the file into Hive table
+# Open Hive
+hive
+
+# Create a database
+CREATE DATABASE IF NOT EXISTS sriharis;
+
+# Use the created database
+USE sriharis;
+
+# Check all tables already present
+SHOW TABLES;
+
+CREATE TABLE MunicipalCourtCaseLoadInformation (offense_case_type String, offense_date String, offense_time String, offense_charge_desc String, offense_street_name String, offense_cross_street_check String, offense_cross_street String, school_zone String, construction_zone String, case_closed String) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE tblproperties ("skip.header.line.count"="1");
+
+SHOW TABLES;
+
+# Load data into table
+LOAD DATA LOCAL INPATH '/home/sriharis/data/Municipal_Court_Caseload_Information.csv' INTO TABLE MunicipalCourtCaseLoadInformation;
+
+
+
+# ------------------------------------------------------------------------------------------- #
+# Q4. Ensure your process the header record correctly
+# Verify by executing a query
+SELECT COUNT(*) FROM MunicipalCourtCaseLoadInformation;
+
+
+
+# ------------------------------------------------------------------------------------------- #
+# Q5. Delete both zipped file and CSV file from Linux machine, keeping only the file in HDFS
+# Exit Hive 
+exit;
+# Remove the unnecessary files
+rm /home/sriharis/data/Municipal_Court_Caseload_Information.csv
+rm /home/sriharis/data/Municipal_Court_Caseload_Information.zip 
+
+# Make a folder to store the results of Hive Queries
+mkdir /home/sriharis/assignment_2 
+
+
+
+# ------------------------------------------------------------------------------------------- #
+# Q6. Calculate frequency of offences by Offense Case Type
+hive -e 'SELECT offense_case_type, COUNT(offense_case_type) AS frequency FROM sriharis.MunicipalCourtCaseLoadInformation GROUP BY offense_case_type;' > /home/sriharis/assignment_2/offense_case_group.csv
+
+
+
+# ------------------------------------------------------------------------------------------- #
+# Q7. Identify the most frequent offences by Offense Charge Description (Show Offense Charge Description and offence frequency count in descending order)
+hive -e 'SELECT offense_charge_desc, COUNT(offense_charge_desc) AS offense_freq_count FROM sriharis.municipalcourtcaseloadinformation GROUP BY offense_charge_desc SORT BY offense_freq_count DESC;' > /home/sriharis/assignment_2/offense_charge.csv
+
+
+
+# ------------------------------------------------------------------------------------------- #
+# Q8. Your final output / project result can be in any format (i.e. Excel)
+# Transfer files from MidWay2 to local machine
+scp sriharis@midway2.rcc.uchicago.edu:/home/sriharis/assignment_2/*.csv ./
