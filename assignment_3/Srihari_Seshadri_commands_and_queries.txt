@@ -19,15 +19,15 @@ hdfs dfs -put ./*.csv /user/sriharis/assignment_3/
 
 
 
-
+# Call up the pig
+pig -useHCatalog
+SET hcat.bin /usr/bin/hcat;
 
 # ------------------------------------------------------------------------------
 # 3. You must create three Hive tables (one for each file). 
 # You must run create table and store commands within Pig
 # ------------------------------------------------------------------------------
 
-# Users table
-SET hcat.bin /usr/bin/hcat;
 
 bx_users = LOAD '/user/sriharis/assignment_3/BX-Users.csv' 
     USING org.apache.pig.piggybank.storage.CSVExcelStorage(';', 
@@ -86,4 +86,13 @@ STORE bx_book_ratings INTO 'sriharis.bx_book_ratings'
 # 4. You must perform joins and final calculations in Hadoop using Pig
 # ------------------------------------------------------------------------------
 
-# Join using isbn and user_id
+bx_users = LOAD 'sriharis.bx_users' 
+    USING org.apache.hive.hcatalog.pig.HCatLoader();
+bx_books = LOAD 'sriharis.bx_books' 
+    USING org.apache.hive.hcatalog.pig.HCatLoader();
+bx_book_ratings = LOAD 'sriharis.bx_book_ratings' USING org.apache.hive.hcatalog.pig.HCatLoader();
+
+bx_joined = JOIN bx_users BY id, bx_book_ratings BY user_id ;
+bx_joined = JOIN bx_joined BY isbn, bx_books BY isbn ;
+
+
