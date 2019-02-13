@@ -1,0 +1,89 @@
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Your final output should produce the Sum, Avg, Min, Max and the record count 
+# for the ratings. 
+# The results must be sorted in descending order based on record count 
+# and the Location cannot be enclosed in quotes.
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+
+
+mkdir /home/sriharis/assignment_3 && cd /home/sriharis/assignment_3
+cp /project/msca/kadochnikov/data/BX-CSV-Dump.zip ./
+
+
+# Make a dir to in the HDFS file system to hold the data
+hdfs dfs -mkdir /user/sriharis/assignment_3
+hdfs dfs -put ./*.csv /user/sriharis/assignment_3/
+
+
+
+
+
+# ------------------------------------------------------------------------------
+# 3. You must create three Hive tables (one for each file). 
+# You must run create table and store commands within Pig
+# ------------------------------------------------------------------------------
+
+# Users table
+SET hcat.bin /usr/bin/hcat;
+
+bx_users = LOAD '/user/sriharis/assignment_3/BX-Users.csv' 
+    USING org.apache.pig.piggybank.storage.CSVExcelStorage(';', 
+                                    'NO_MULTILINE', 'UNIX', 'SKIP_INPUT_HEADER')  
+    AS ( id:int, location:chararray, age:int );
+bx_books = LOAD '/user/sriharis/assignment_3/BX-Books.csv' 
+    USING org.apache.pig.piggybank.storage.CSVExcelStorage(';', 
+                                    'NO_MULTILINE', 'UNIX', 'SKIP_INPUT_HEADER')  
+    AS ( isbn:chararray,
+         book_title:chararray,
+         book_author:chararray,
+         year_of_publication:chararray,
+         publisher:chararray,
+         img_url_s:chararray,
+         img_url_m:chararray,
+         img_url_l:chararray);
+bx_book_ratings = LOAD '/user/sriharis/assignment_3/BX-Book-Ratings.csv' 
+    USING org.apache.pig.piggybank.storage.CSVExcelStorage(';', 
+                                    'NO_MULTILINE', 'UNIX', 'SKIP_INPUT_HEADER')  
+    AS (user_id:int,
+        isbn:chararray,
+        book_rating:int);
+
+
+SQL DROP TABLE sriharis.bx_users;
+SQL DROP TABLE sriharis.bx_books;
+SQL DROP TABLE sriharis.bx_book_ratings;
+
+
+SQL CREATE TABLE sriharis.bx_users(id int, location string, age int);
+SQL CREATE TABLE sriharis.bx_books(isbn string, 
+        book_title string,
+        book_author string,
+        year_of_publication string,
+        publisher string,
+        img_url_s string,
+        img_url_m string,
+        img_url_l string);
+SQL CREATE TABLE sriharis.bx_book_ratings(user_id int,
+        isbn string,
+        book_rating int);
+
+
+
+STORE bx_users INTO 'sriharis.bx_users' 
+    USING org.apache.hive.hcatalog.pig.HCatStorer();
+STORE bx_books INTO 'sriharis.bx_books' 
+    USING org.apache.hive.hcatalog.pig.HCatStorer();
+STORE bx_book_ratings INTO 'sriharis.bx_book_ratings' 
+    USING org.apache.hive.hcatalog.pig.HCatStorer();
+
+
+
+
+# ------------------------------------------------------------------------------
+# 4. You must perform joins and final calculations in Hadoop using Pig
+# ------------------------------------------------------------------------------
+
+# Join using isbn and user_id
