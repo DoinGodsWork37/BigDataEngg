@@ -108,3 +108,21 @@ out = ORDER tmp BY rec_num DESC;
 a = limit out 10;
 dump a;
 
+
+# ------------------------------------------------------------------------------
+# 5. Your final output must be persisted on disk as Hive table
+# ------------------------------------------------------------------------------
+
+SQL DROP TABLE sriharis.location_info;
+SQL CREATE TABLE sriharis.location_info(location string, 
+                                        book_rating_sum string, 
+                                        book_rating_avg float, 
+                                        book_rating_min float, 
+                                        book_rating_max float, 
+                                        rec_num int);
+STORE out INTO 'sriharis.location_info' 
+    USING org.apache.hive.hcatalog.pig.HCatStorer();
+
+
+
+
