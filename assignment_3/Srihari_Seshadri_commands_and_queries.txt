@@ -7,16 +7,21 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------
+# You cannot download these files to your local computer.
+# All processing must take place on RCC server
+# BX-Book-Ratings, BX-Books and  BX-Users must be loaded into HDFS on RCC
+# ------------------------------------------------------------------------------
 
-
+# Create a temporary directory to hold the Zip files and their extracts
 mkdir /home/sriharis/assignment_3 && cd /home/sriharis/assignment_3
 cp /project/msca/kadochnikov/data/BX-CSV-Dump.zip ./
+unzip /project/msca/kadochnikov/data/BX-CSV-Dump.zip
 
 
 # Make a dir to in the HDFS file system to hold the data
 hdfs dfs -mkdir /user/sriharis/assignment_3
 hdfs dfs -put ./*.csv /user/sriharis/assignment_3/
-
 
 
 # Call up the pig
@@ -105,9 +110,9 @@ tmp = FOREACH bx_group GENERATE
 	MAX(bx_joined.book_rating) as book_rating_max,
 	COUNT(bx_joined) as rec_num;
 out = ORDER tmp BY rec_num DESC;
-a = limit out 10;
-dump a;
 
+# Quick look at the column types to save into Hive
+DESCRIBE out;
 
 # ------------------------------------------------------------------------------
 # 5. Your final output must be persisted on disk as Hive table
@@ -115,14 +120,13 @@ dump a;
 
 SQL DROP TABLE sriharis.location_info;
 SQL CREATE TABLE sriharis.location_info(location string, 
-                                        book_rating_sum string, 
-                                        book_rating_avg float, 
-                                        book_rating_min float, 
-                                        book_rating_max float, 
-                                        rec_num int);
+                                        book_rating_sum BIGINT, 
+                                        book_rating_avg double, 
+                                        book_rating_min int, 
+                                        book_rating_max int, 
+                                        rec_num BIGINT);
 STORE out INTO 'sriharis.location_info' 
     USING org.apache.hive.hcatalog.pig.HCatStorer();
-
 
 
 
