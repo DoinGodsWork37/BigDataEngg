@@ -90,9 +90,21 @@ bx_users = LOAD 'sriharis.bx_users'
     USING org.apache.hive.hcatalog.pig.HCatLoader();
 bx_books = LOAD 'sriharis.bx_books' 
     USING org.apache.hive.hcatalog.pig.HCatLoader();
-bx_book_ratings = LOAD 'sriharis.bx_book_ratings' USING org.apache.hive.hcatalog.pig.HCatLoader();
+bx_book_ratings = LOAD 'sriharis.bx_book_ratings' 
+    USING org.apache.hive.hcatalog.pig.HCatLoader();
 
 bx_joined = JOIN bx_users BY id, bx_book_ratings BY user_id ;
 bx_joined = JOIN bx_joined BY isbn, bx_books BY isbn ;
 
+bx_group = GROUP bx_joined BY location;
+tmp = FOREACH bx_group GENERATE
+	group AS location,
+	SUM(bx_joined.book_rating) as book_rating_sum,
+	AVG(bx_joined.book_rating) as book_rating_avg,
+	MIN(bx_joined.book_rating) as book_rating_min,
+	MAX(bx_joined.book_rating) as book_rating_max,
+	COUNT(bx_joined) as rec_num;
+out = ORDER tmp BY rec_num DESC;
+a = limit out 10;
+dump a;
 
