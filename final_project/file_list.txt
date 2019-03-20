@@ -1,4 +1,4 @@
-Found 13656 items
+Found 13660 items
 -rw-r--r--   3 ivy2 ivy2     52.7 M 2017-06-22 10:15 /user/ivy2/Tweets/tweets201706221015.json
 -rw-r--r--   3 ivy2 ivy2     50.0 M 2017-06-22 11:15 /user/ivy2/Tweets/tweets201706221115.json
 -rw-r--r--   3 ivy2 ivy2     53.6 M 2017-06-22 12:15 /user/ivy2/Tweets/tweets201706221215.json
@@ -13655,3 +13655,7 @@ Found 13656 items
 -rw-r--r--   3 ivy2 ivy2     54.1 M 2019-03-20 04:15 /user/ivy2/Tweets/tweets201903200415.json
 -rw-r--r--   3 ivy2 ivy2     54.1 M 2019-03-20 05:15 /user/ivy2/Tweets/tweets201903200515.json
 -rw-r--r--   3 ivy2 ivy2     61.1 M 2019-03-20 06:15 /user/ivy2/Tweets/tweets201903200615.json
+-rw-r--r--   3 ivy2 ivy2     73.5 M 2019-03-20 07:15 /user/ivy2/Tweets/tweets201903200715.json
+-rw-r--r--   3 ivy2 ivy2     84.2 M 2019-03-20 08:15 /user/ivy2/Tweets/tweets201903200815.json
+-rw-r--r--   3 ivy2 ivy2     97.4 M 2019-03-20 09:15 /user/ivy2/Tweets/tweets201903200915.json
+-rw-r--r--   3 ivy2 ivy2    110.0 M 2019-03-20 10:15 /user/ivy2/Tweets/tweets201903201015.json
