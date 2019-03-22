@@ -1,4 +1,4 @@
-Found 13681 items
+Found 13696 items
 -rw-r--r--   3 ivy2 ivy2     52.7 M 2017-06-22 10:15 /user/ivy2/Tweets/tweets201706221015.json
 -rw-r--r--   3 ivy2 ivy2     50.0 M 2017-06-22 11:15 /user/ivy2/Tweets/tweets201706221115.json
 -rw-r--r--   3 ivy2 ivy2     53.6 M 2017-06-22 12:15 /user/ivy2/Tweets/tweets201706221215.json
@@ -13680,3 +13680,18 @@ Found 13681 items
 -rw-r--r--   3 ivy2 ivy2     65.0 M 2019-03-21 05:15 /user/ivy2/Tweets/tweets201903210515.json
 -rw-r--r--   3 ivy2 ivy2     78.2 M 2019-03-21 06:15 /user/ivy2/Tweets/tweets201903210615.json
 -rw-r--r--   3 ivy2 ivy2     97.4 M 2019-03-21 07:15 /user/ivy2/Tweets/tweets201903210715.json
+-rw-r--r--   3 ivy2 ivy2    117.6 M 2019-03-21 08:15 /user/ivy2/Tweets/tweets201903210815.json
+-rw-r--r--   3 ivy2 ivy2    132.8 M 2019-03-21 09:15 /user/ivy2/Tweets/tweets201903210915.json
+-rw-r--r--   3 ivy2 ivy2    141.0 M 2019-03-21 10:15 /user/ivy2/Tweets/tweets201903211015.json
+-rw-r--r--   3 ivy2 ivy2    146.1 M 2019-03-21 11:15 /user/ivy2/Tweets/tweets201903211115.json
+-rw-r--r--   3 ivy2 ivy2    136.0 M 2019-03-21 12:15 /user/ivy2/Tweets/tweets201903211215.json
+-rw-r--r--   3 ivy2 ivy2    129.4 M 2019-03-21 13:15 /user/ivy2/Tweets/tweets201903211315.json
+-rw-r--r--   3 ivy2 ivy2    118.2 M 2019-03-21 14:15 /user/ivy2/Tweets/tweets201903211415.json
+-rw-r--r--   3 ivy2 ivy2    110.2 M 2019-03-21 15:15 /user/ivy2/Tweets/tweets201903211515.json
+-rw-r--r--   3 ivy2 ivy2    115.2 M 2019-03-21 16:15 /user/ivy2/Tweets/tweets201903211615.json
+-rw-r--r--   3 ivy2 ivy2    101.0 M 2019-03-21 17:15 /user/ivy2/Tweets/tweets201903211715.json
+-rw-r--r--   3 ivy2 ivy2     90.7 M 2019-03-21 18:15 /user/ivy2/Tweets/tweets201903211815.json
+-rw-r--r--   3 ivy2 ivy2     87.6 M 2019-03-21 19:15 /user/ivy2/Tweets/tweets201903211915.json
+-rw-r--r--   3 ivy2 ivy2     94.9 M 2019-03-21 20:15 /user/ivy2/Tweets/tweets201903212015.json
+-rw-r--r--   3 ivy2 ivy2     89.5 M 2019-03-21 21:15 /user/ivy2/Tweets/tweets201903212115.json
+-rw-r--r--   3 ivy2 ivy2     65.2 M 2019-03-21 23:15 /user/ivy2/Tweets/tweets201903212315.json
