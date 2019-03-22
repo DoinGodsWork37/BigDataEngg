@@ -19,7 +19,7 @@ def plot_donut(values, labels, colors, donut_hole_rad=0.7):
     p.gca().add_artist(my_circle)
     plt.show()
     
-def plot_pie(values, labels, colors, ax, donut_hole_rad=0.7):
+def plot_pie(values, labels, colors, ax):
     ax.pie(x=values, labels=labels, colors=colors)
     
     
@@ -104,7 +104,7 @@ def plot_corr_heatmap(corrmat, annotate=False, annot_size=15):
     plt.show()
 
 
-def plot_pie(data, col_name, ax):
+def plot_pie_df(data, col_name, ax):
     col_cnt = data[col_name].value_counts()
     g = col_cnt.plot.pie(startangle=90, autopct='%.2f', ax=ax)
 
