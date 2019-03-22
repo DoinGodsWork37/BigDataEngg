@@ -12,6 +12,17 @@ import seaborn as sns
 from matplotlib.ticker import PercentFormatter
 
 
+def plot_donut(values, labels, colors, donut_hole_rad=0.7):
+    my_circle=plt.Circle( (0,0), 0.7, color='white')
+    plt.pie(x=values, labels=labels, colors=colors)
+    p=plt.gcf()
+    p.gca().add_artist(my_circle)
+    plt.show()
+    
+def plot_pie(values, labels, colors, ax, donut_hole_rad=0.7):
+    ax.pie(x=values, labels=labels, colors=colors)
+    
+    
 def plot_naive_variance(pca, ax):
     '''
     Plots the variance explained by each of the principal components.
@@ -129,7 +140,7 @@ def plot_bar_timegraph(x, y, data, ax, highlight_max_min=False,
     ax.legend(handles=ax.lines[::len(data) + 1], labels=[y, y + " % change"])
 
 
-def plot_box_timegraph(x, y, data, agg_rule, ax, point_plot=True, annot=False,
+def plot_box(x, y, data, agg_rule, ax, point_plot=True, annot=False,
                        title="", xlabel="", ylabel="", ylim=None):
     # Get the median value at each year
     agg_data = data[[y, x]].groupby(by=[x], as_index=False).agg(agg_rule)
